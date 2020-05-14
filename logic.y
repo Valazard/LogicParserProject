@@ -8,9 +8,15 @@
 %}
 
 %%
+
+%union {char id;bool isWhat;}
 %start line
 %token print
+%token exit_command
 %token <id> identifier
+%token <isWhat> value
 
 %%
 
+int main(){
+}

@@ -18,8 +18,8 @@
 %token print
 %token exit_command
 %token <id> identifier
-%token <isWhat> value
-%type <id> assigment 
+%token <isWhat> vt
+%type <id> operator 
 
 %%
 
@@ -28,8 +28,8 @@ line	: assignment ';'	{;}
         | exit_command ';'	{exit(EXIT_SUCCESS);}
 	| print exp ';'		{printf("The variable %d\n",$2)}
 	| line assigment ';'	{;}
-	|
-
+	| line exit_command ';' {exit(EXIT_SUCCESS);}
+	;
 
 
 

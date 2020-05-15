@@ -5,9 +5,10 @@ int yylex();
 %%
 "print"		{return print;}
 "exit"		{return exit_command;}
+["true"]	{yyval.id=yytext[0];return true;}
 [ \t\n]         ;
 [a-zA-Z]	{yyval.id=yytext[0]; return identifier;}
-[&+~=]		{return yytext[0];}
+[&+~=]		{yyval.id=yytext[0];return operator}
 .		{ECHO;yyerror("unexpected character");}
 %%
 

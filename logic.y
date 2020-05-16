@@ -9,7 +9,7 @@
 	#include <stdio.h>
 	#include <stdlib.h>
 	#include <stdbool.h>/*Including the library for boolean primitive type be available */
-	bool logicVars[52];
+	bool g_logicVars[52];
 	int  findIndex(char* logicVar);
 	void printVar(char* logicVar);
 	void updateVar(char logicVar,bool value);
@@ -29,21 +29,28 @@
 %%
 
 /* descriptions of the inputs	actions in C */
-line	: assignment ';'				{;}
-        | exit_command ';'				{exit(EXIT_SUCCESS);}
-		| print							{;}
-		| print identifier ';'			{printVar(&$2);}
-		| line exit_command ';' 		{exit(EXIT_SUCCESS);}
-		;
+line	: assignment ';'			{;}
+        | exit_command ';'			{exit(EXIT_SUCCESS);}
+	| print					{;}
+	| print identifier ';'			{printVar(&$2);}
+	| line exit_command ';' 		{exit(EXIT_SUCCESS);}
+	;
 
-vt		: vt ';'						{;}
-		| identifier '=' vt				{updateVar($1,$3);}
-		;
+vt	: vt ';'				{;}
+	| identifier '=' vt			{updateVar($1,$3);}
+	;
 
-ope		: ope ';'						{;}
+ope	: ope ';'				{;}
     	| identifier ope vt ';'			{updateVar($1,$3);}
-		| identifier ope identifier ';'	{executeOpe($1,$2,$3);}
-		;
+	| identifier ope identifier ';'		{executeOpe($1,$2,$3);}
+	;
+
+%%
+/*Declaring YACC specific C functions before Actual C actions*/
+
+void yyerror(char* s){
+	fprintf(stderr,"%s\n",s);
+}
 
 int findIndex(char* logicVar){
 	int index=0;
@@ -51,11 +58,20 @@ int findIndex(char* logicVar){
 		index=&logicVar - 'a' + 26;
 	}
 	else{
-		index=&logicVar-'A';
+		index=&logicVar - 'A';
 	}
 	return index;
 }
 
-
-int main(){
+void printVar(CHAR* logicVar){
 }
+
+int main(void){
+	/*initializing symbol table for the logic vars as false for every element*/
+	for(int i=0;i<52;i++){
+		g_logicVars[i]=false;	
+	}
+	return yyparse();
+
+}
+

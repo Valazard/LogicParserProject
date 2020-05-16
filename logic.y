@@ -8,7 +8,10 @@
 	#include <stdlib.h>
 	#include <stdbool.h>/*Including the library for boolean primitive type be available */
 	bool logicVars[52];
-	void updateVars(char logicVar,bool value);
+	int  findIndex(char* logicVar);
+	void printVar(char* logicVar);
+	void updateVar(char logicVar,bool value);
+	void executeOpe(char logicVar1, char ope,char logicVar2);
 %}
 
 %%
@@ -18,19 +21,38 @@
 %token print
 %token exit_command
 %token <id> identifier
-%token <isWhat> vt
-%type <id> operator 
+%type <isWhat> vt
+%type <id> ope
 
 %%
 
 /* descriptions of the inputs	actions in C */
-line	: assignment ';'	{;}
-        | exit_command ';'	{exit(EXIT_SUCCESS);}
-	| print exp ';'		{printf("The variable %d\n",$2)}
-	| line assigment ';'	{;}
-	| line exit_command ';' {exit(EXIT_SUCCESS);}
-	;
+line	: assignment ';'				{;}
+        | exit_command ';'				{exit(EXIT_SUCCESS);}
+		| print							{;}
+		| print identifier ';'			{printVar(&$2);}
+		| line exit_command ';' 		{exit(EXIT_SUCCESS);}
+		;
 
+vt		: vt ';'						{;}
+		| identifier '=' vt				{updateVar($1,$3);}
+		;
+
+ope		: ope ';'						{;}
+    	| identifier ope vt ';'			{updateVar($1,$3);}
+		| identifier ope identifier ';'	{executeOpe($1,$2,$3);}
+		;
+
+int findIndex(char* logicVar){
+	int index=0;
+	if(islower(&logicVar)){
+		index=&logicVar - 'a' + 26;
+	}
+	else{
+		index=&logicVar-'A';
+	}
+	return index;
+}
 
 
 int main(){

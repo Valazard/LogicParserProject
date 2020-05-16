@@ -3,6 +3,8 @@
 *the software should be able to simplify the expression
 */
 %{
+	void yyerror(char* s);
+	int  yylex();/*Adding YACC functions before any further step to avoid any YACC process issues*/
 	#include <ctype.h>
 	#include <stdio.h>
 	#include <stdlib.h>

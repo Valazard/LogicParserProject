@@ -1,7 +1,9 @@
 %{
+#include "y.tab.h"
 void yyerror(char *s);
 int yylex();
 %}
+
 %%
 "print"		{return print;}
 "exit"		{return exit_command;}

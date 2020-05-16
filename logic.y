@@ -42,7 +42,7 @@ vt	: vt ';'				{;}
 
 ope	: ope ';'				{;}
     	| identifier ope vt ';'			{updateVar($1,$3);}
-	| identifier ope identifier ';'		{executeOpe($1,$2,$3);}
+	| identifier ope identifier ';'		{executeOpe(&$1,&$2,&$3);}
 	;
 
 %%
@@ -54,16 +54,34 @@ void yyerror(char* s){
 
 int findIndex(char* logicVar){
 	int index=0;
-	if(islower(&logicVar)){
-		index=&logicVar - 'a' + 26;
+	if(islower(*logicVar)){
+		index=*logicVar - 'a' + 26;
 	}
 	else{
-		index=&logicVar - 'A';
+		index=*logicVar - 'A';
 	}
 	return index;
 }
 
-void printVar(CHAR* logicVar){
+void printVar(char* logicVar){
+	int index=findIndex(logicVar);
+	if (g_logicVars[index]){
+		printf("%s the variable is True",*logicVar);
+	}
+	else{
+		printf("%s the variable is False",*logicVar);
+	}
+}
+
+void updateVar(char* logicVar,bool value){
+	int index=findIndex(logicVar);
+	g_logicVars[index]=value;
+	printVar(logicVar);
+}
+
+
+void executeOpe(char* logicVar1, char* ope,char* logicVar2){
+
 }
 
 int main(void){

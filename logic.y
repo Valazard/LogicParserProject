@@ -18,22 +18,29 @@
 
 %%
 
+
 %union {char id;bool isWhat;}	/* YACC definitions */
-%start line
-%token print
-%token exit_command
-%token <id> identifier
-%type <isWhat> vt
-%type <id> ope
+%start 			line
+%token 			PRINT
+%token 			EXIT
+%left 	<id> 		NOT
+%left 	<id> 		AND
+%token 	<id>		OR
+%right	<id>		THEN
+%right	<id>		EQUAL
+%token 	<id> 		IDENTIFIER
+%type 	<isWhat> 	vt
+%type 	<id> 		ope
+
 
 %%
 
 /* descriptions of the inputs	actions in C */
-line	: assignment ';'			{;}
-        | exit_command ';'			{exit(EXIT_SUCCESS);}
-	| print					{;}
-	| print identifier ';'			{printVar(&$2);}
-	| line exit_command ';' 		{exit(EXIT_SUCCESS);}
+line	: line ';'				{;}
+        | EXIT 	';'				{exit(EXIT_SUCCESS);}
+	| PRINT					{;}
+	| PRINT IDENTIFIER ';'			{printVar($2);}
+	| line EXIT ';' 			{exit(EXIT_SUCCESS);}
 	;
 
 vt	: vt ';'				{;}
@@ -42,7 +49,7 @@ vt	: vt ';'				{;}
 
 ope	: ope ';'				{;}
     	| identifier ope vt ';'			{updateVar($1,$3);}
-	| identifier ope identifier ';'		{executeOpe(&$1,&$2,&$3);}
+	| identifier ope identifier ';'		{executeOpe($1,$2,$3);}
 	;
 
 %%
@@ -52,35 +59,35 @@ void yyerror(char* s){
 	fprintf(stderr,"%s\n",s);
 }
 
-int findIndex(char* logicVar){
+int findIndex(char logicVar){
 	int index=0;
-	if(islower(*logicVar)){
-		index=*logicVar - 'a' + 26;
+	if(islower(logicVar)){
+		index=logicVar - 'a' + 26;
 	}
 	else{
-		index=*logicVar - 'A';
+		index=logicVar - 'A';
 	}
 	return index;
 }
 
-void printVar(char* logicVar){
+void printVar(char logicVar){
 	int index=findIndex(logicVar);
 	if (g_logicVars[index]){
-		printf("%s the variable is True",*logicVar);
+		printf("%s the variable is True",logicVar);
 	}
 	else{
-		printf("%s the variable is False",*logicVar);
+		printf("%s the variable is False",logicVar);
 	}
 }
 
-void updateVar(char* logicVar,bool value){
+void updateVar(char logicVar,bool value){
 	int index=findIndex(logicVar);
 	g_logicVars[index]=value;
-	printVar(logicVar);
+	printVar(&logicVar);
 }
 
 
-void executeOpe(char* logicVar1, char* ope,char* logicVar2){
+void executeOpe(char logicVar1, char ope,char logicVar2){
 
 }
 

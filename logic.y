@@ -14,7 +14,7 @@
 	int  findIndex(char* logicVar);
 	void printVar(char logicVar);
 	void updateVar(char logicVar,bool value);
-	void executeOperation(char logicVar1,int ope,char logicVar2);/* Using integers to represent each of the expressions*/
+	bool executeOperation(char logicVar1,int ope,char logicVar2);/* Using integers to represent each of the expressions*/
 %}
 
 %%
@@ -88,29 +88,51 @@ void updateVar(char logicVar,bool value){
 }
 
 
-void executeOpe(char logicVar1, int ope,char logicVar2){
+bool executeOperation(char logicVar1, int ope,char logicVar2){
 	int index1=findIndex(&logicVar1);
 	int index2=findIndex(&logicVar2);
+	bool opeResult=false;
 	switch (ope){
 		case not:
-			if(g_logicVars[index1]){
-				g_logicVars[index1]=false;
-			}
-			else{
-				g_logicVars[index2]=true;
+			if(!g_logicVars[index1]){
+				opeResult=true;
 			}
 			break;
 		case and:
-			if()
+			if(g_logicVars[index1] && g_logicVars[index2]){
+				opeResult=true;	
+			}
 			break;
 		case or:
+			if(g_logicVars[index1] || g_logicVars[index2]){
+				opeResult=true;
+			}
 			break;
 		case then:
+			if(!g_logicVars[index2]){
+				if(g_logicVars){
+					opeResult=false;/*Just stating this so the code logic makes sense */
+				}
+				else{
+					opeResult=true;
+				}
+			}
+			else{
+				opeResult=true;
+			}
 			break;
 		case equal:
+			if(g_logicVars[index1] == g_logicVars[index2]){
+				opeResult=true;
+			}
 			break;
 
 	}
+	return opeResult;
+
+}
+
+void addToStack(){
 
 }
 

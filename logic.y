@@ -1,6 +1,6 @@
 /*
-*This project aimsd to use a one dimension boolean array to save case sensitive binary variables
-*the software should be able to simplify the expression
+*This project aims to use a one dimension boolean array to save case sensitive binary variables
+*the software should be able to solve/simplify the a given logic expression
 */
 %{
 	void yyerror(char* s);
@@ -10,10 +10,17 @@
 	#include <stdlib.h>
 	#include <stdbool.h>/*Including the library for boolean primitive type be available */
 	bool g_logicVars[52];
+	typedef struct stack{
+		stack* next;
+		char id1;
+		int ope;
+		char id2;
+		
+	};
 	int  findIndex(char* logicVar);
-	void printVar(char* logicVar);
+	void printVar(char logicVar);
 	void updateVar(char logicVar,bool value);
-	void executeOpe(char logicVar1, char ope,char logicVar2);
+	void executeOperation(char logicVar1,int ope,char logicVar2);/* Using integers to represent each of the expressions*/
 %}
 
 %%
@@ -24,32 +31,31 @@
 %token 			PRINT
 %token 			EXIT
 %left 	<id> 		NOT
-%left 	<id> 		AND
-%token 	<id>		OR
-%right	<id>		THEN
-%right	<id>		EQUAL
+%left 	 		AND
+%token 			OR
+%right			THEN
+%right			EQUAL
 %token 	<id> 		IDENTIFIER
-%type 	<isWhat> 	vt
-%type 	<id> 		ope
+%type 	<isWhat> 	VT
 
 
 %%
 
 /* descriptions of the inputs	actions in C */
-line	: line ';'				{;}
-        | EXIT 	';'				{exit(EXIT_SUCCESS);}
+line	: line 					{;}
+        | EXIT 					{exit(EXIT_SUCCESS);}
 	| PRINT					{;}
-	| PRINT IDENTIFIER ';'			{printVar($2);}
-	| line EXIT ';' 			{exit(EXIT_SUCCESS);}
+	| PRINT IDENTIFIER 			{printVar($2);}
+	| NOT IDENTIFIER 			{executeOperation($2,0,'@');}
+	| IDENTIFIER AND IDENTIFIER		{executeOperation($1,1,$3);}
+	| IDENTIFIER OR IDENTIFIER		{executeOperation($1,2,$3);}
+	| IDENTIFIER THEN IDENTIFIER 		{executeOperation($1,3,$3);}
+	| IDENTIFIER EQUAL IDENTIFIER 		{executeOperation($1,4,$3);}
+	| line EXIT	 			{exit(EXIT_SUCCESS);}
 	;
 
-vt	: vt ';'				{;}
-	| IDENTIFIER '=' vt			{updateVar($1,$3);}
-	;
-
-ope	: ope ';'				{;}
-    	| identifier ope vt ';'			{updateVar($1,$3);}
-	| identifier ope identifier ';'		{executeOpe($1,$2,$3);}
+VT	: VT 					{;}
+	| IDENTIFIER '=' VT 			{updateVar($1,$3);}
 	;
 
 %%
@@ -59,7 +65,7 @@ void yyerror(char* s){
 	fprintf(stderr,"%s\n",s);
 }
 
-int findIndex(char logicVar){
+int findIndex(char* logicVar){
 	int index=0;
 	if(islower(logicVar)){
 		index=logicVar - 'a' + 26;
@@ -81,9 +87,9 @@ void printVar(char logicVar){
 }
 
 void updateVar(char logicVar,bool value){
-	int index=findIndex(logicVar);
+	int index=findIndex(&logicVar);
 	g_logicVars[index]=value;
-	printVar(&logicVar);
+	printVar(logicVar);
 }
 
 

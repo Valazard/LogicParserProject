@@ -10,13 +10,7 @@
 	#include <stdlib.h>
 	#include <stdbool.h>/*Including the library for boolean primitive type be available */
 	bool g_logicVars[52];
-	typedef struct stack{
-		stack* next;
-		char id1;
-		int ope;
-		char id2;
-		
-	};
+	enum operations {not,and,or,then,equal};
 	int  findIndex(char* logicVar);
 	void printVar(char logicVar);
 	void updateVar(char logicVar,bool value);
@@ -46,11 +40,12 @@ line	: line 					{;}
         | EXIT 					{exit(EXIT_SUCCESS);}
 	| PRINT					{;}
 	| PRINT IDENTIFIER 			{printVar($2);}
-	| NOT IDENTIFIER 			{executeOperation($2,0,'@');}
-	| IDENTIFIER AND IDENTIFIER		{executeOperation($1,1,$3);}
-	| IDENTIFIER OR IDENTIFIER		{executeOperation($1,2,$3);}
-	| IDENTIFIER THEN IDENTIFIER 		{executeOperation($1,3,$3);}
-	| IDENTIFIER EQUAL IDENTIFIER 		{executeOperation($1,4,$3);}
+	| NOT					{executeOperation($<id>$,not,'z');}
+	| NOT IDENTIFIER 			{executeOperation($2,not,'z');}
+	| IDENTIFIER AND IDENTIFIER		{executeOperation($1,and,$3);}
+	| IDENTIFIER OR IDENTIFIER		{executeOperation($1,or,$3);}
+	| IDENTIFIER THEN IDENTIFIER 		{executeOperation($1,then,$3);}
+	| IDENTIFIER EQUAL IDENTIFIER 		{executeOperation($1,equal,$3);}
 	| line EXIT	 			{exit(EXIT_SUCCESS);}
 	;
 
@@ -93,7 +88,29 @@ void updateVar(char logicVar,bool value){
 }
 
 
-void executeOpe(char logicVar1, char ope,char logicVar2){
+void executeOpe(char logicVar1, int ope,char logicVar2){
+	int index1=findIndex(&logicVar1);
+	int index2=findIndex(&logicVar2);
+	switch (ope){
+		case not:
+			if(g_logicVars[index1]){
+				g_logicVars[index1]=false;
+			}
+			else{
+				g_logicVars[index2]=true;
+			}
+			break;
+		case and:
+			if()
+			break;
+		case or:
+			break;
+		case then:
+			break;
+		case equal:
+			break;
+
+	}
 
 }
 

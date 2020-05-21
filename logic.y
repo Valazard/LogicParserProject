@@ -11,6 +11,12 @@
 	#include <stdbool.h>/*Including the library for boolean primitive type be available */
 	bool g_logicVars[52];
 	enum operations {not,and,or,then,equal};
+	typedef struct stack{
+		int index1;
+		int index2;
+		int ope;
+		stack* next;
+	};
 	int  findIndex(char* logicVar);
 	void printVar(char logicVar);
 	void updateVar(char logicVar,bool value);

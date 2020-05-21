@@ -44,7 +44,7 @@ line	: line ';'				{;}
 	;
 
 vt	: vt ';'				{;}
-	| identifier '=' vt			{updateVar($1,$3);}
+	| IDENTIFIER '=' vt			{updateVar($1,$3);}
 	;
 
 ope	: ope ';'				{;}

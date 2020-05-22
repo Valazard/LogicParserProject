@@ -150,20 +150,36 @@ void addToStack(char logicVar1,int ope,char logicVar2){
 	stack* temp=g_logicStack->next;
 	newStep->index1=indexVar1;
 	newStep->index2=indexVar2;
-	if(temp != g_logicStack ){
+	if(temp != g_logicStack){
 		while(temp != g_logicStack && !concluded){
-		
+			if(temp->operator < ope && temp->next->operator >= ope ){
+				newStep->next=temp->next;
+				temp->next=newStep;
+				concluded=true;
+			}
+			temp=temp->next;	
 		}
 	}
-	else{
+	else if(g_logicStack->index1 == -1){
 		newStep->next=newStep;
-		
+		free(g_logicStack);
+		g_logicStack=newStep;
+	}
+	else if(g_logicStack->operator < ope){
+		newStep->next=g_logicStack;
+		g_logicStack->next=newStep;
+		g_logicStack=newStep;
+	}
+	else{
+		newStep->next=g_logicStack;
+		g_logicStack->next=newStep;
 	}
 	
 
 }
 
 void solveStack(){
+	
 
 }
 
@@ -176,7 +192,7 @@ int main(void){
 	g_logicStack->next=g_logicStack;
 	g_logicStack->index1=-1;/* Setting to initialization value to -1 to provide awareness of newly created stack*/
 	g_logicStack->index2=-1;
-	g_logicStack->ope=-1;
+	g_logicStack->operator=-1;
 	return yyparse();
 
 }

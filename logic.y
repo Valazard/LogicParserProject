@@ -9,6 +9,7 @@
 	#include <stdio.h>
 	#include <stdlib.h>
 	#include <stdbool.h>/*Including the library for boolean primitive type be available */
+	#include <malloc.h>
 	bool g_logicVars[52];
 	enum operations {not,and,or,then,equal};
 	typedef struct stack{
@@ -17,10 +18,14 @@
 		int ope;
 		stack* next;
 	};
+	stack* g_logicStack;
 	int  findIndex(char* logicVar);
 	void printVar(char logicVar);
 	void updateVar(char logicVar,bool value);
-	bool executeOperation(char logicVar1,int ope,char logicVar2);/* Using integers to represent each of the expressions*/
+	bool executeOperation(bool* logicVar1,int ope,bool* logicVar2);/* Using integers to represent each of the expressions*/
+	void addToStack(char logicVar1,int ope,char logicVar2);
+	void solveStack();
+
 %}
 
 %%
@@ -32,10 +37,10 @@
 %token 			EXIT
 %left 	<id> 		NOT
 %left 	 		AND
-%token 			OR
-%right			THEN
-%right			EQUAL
-%token 	<id> 		IDENTIFIER
+%left 			OR
+%left			THEN
+%left			EQUAL
+%left 	<id> 		IDENTIFIER
 %type 	<isWhat> 	VT
 
 
@@ -44,14 +49,15 @@
 /* descriptions of the inputs	actions in C */
 line	: line 					{;}
         | EXIT 					{exit(EXIT_SUCCESS);}
+	| SOLVE					{solveStack();}
 	| PRINT					{;}
 	| PRINT IDENTIFIER 			{printVar($2);}
-	| NOT					{executeOperation($<id>$,not,'z');}
-	| NOT IDENTIFIER 			{executeOperation($2,not,'z');}
-	| IDENTIFIER AND IDENTIFIER		{executeOperation($1,and,$3);}
-	| IDENTIFIER OR IDENTIFIER		{executeOperation($1,or,$3);}
-	| IDENTIFIER THEN IDENTIFIER 		{executeOperation($1,then,$3);}
-	| IDENTIFIER EQUAL IDENTIFIER 		{executeOperation($1,equal,$3);}
+	| NOT					{addToStack($<id>$,not,'z');}
+	| NOT IDENTIFIER 			{addToStack($2,not,'z');}
+	| IDENTIFIER AND IDENTIFIER		{addToStack($1,and,$3);}
+	| IDENTIFIER OR IDENTIFIER		{addToStack($1,or,$3);}
+	| IDENTIFIER THEN IDENTIFIER 		{addToStack($1,then,$3);}
+	| IDENTIFIER EQUAL IDENTIFIER 		{addToStack($1,equal,$3);}
 	| line EXIT	 			{exit(EXIT_SUCCESS);}
 	;
 
@@ -94,29 +100,27 @@ void updateVar(char logicVar,bool value){
 }
 
 
-bool executeOperation(char logicVar1, int ope,char logicVar2){
-	int index1=findIndex(&logicVar1);
-	int index2=findIndex(&logicVar2);
+bool executeOperation(bool* logicVar1, int ope,bool* logicVar2){
 	bool opeResult=false;
 	switch (ope){
 		case not:
-			if(!g_logicVars[index1]){
+			if(!*logicVar1){
 				opeResult=true;
 			}
 			break;
 		case and:
-			if(g_logicVars[index1] && g_logicVars[index2]){
+			if(*logicVar1 && *logicVar2){
 				opeResult=true;	
 			}
 			break;
 		case or:
-			if(g_logicVars[index1] || g_logicVars[index2]){
+			if(*logicVar1 || *logicVar2){
 				opeResult=true;
 			}
 			break;
 		case then:
-			if(!g_logicVars[index2]){
-				if(g_logicVars){
+			if(!*logicVar2){
+				if(*logicVar1){
 					opeResult=false;/*Just stating this so the code logic makes sense */
 				}
 				else{
@@ -128,7 +132,7 @@ bool executeOperation(char logicVar1, int ope,char logicVar2){
 			}
 			break;
 		case equal:
-			if(g_logicVars[index1] == g_logicVars[index2]){
+			if(*logicVar1 == *logicVar2){
 				opeResult=true;
 			}
 			break;
@@ -138,7 +142,28 @@ bool executeOperation(char logicVar1, int ope,char logicVar2){
 
 }
 
-void addToStack(){
+void addToStack(char logicVar1,int ope,char logicVar2){
+	int indexVar1=findIndex(&logicVar1);
+	int indexVar2=findIndex(&logicVar2);
+	bool concluded=false;
+	stack* newStep=(stack*)malloc(sizeof(stack));
+	stack* temp=g_logicStack->next;
+	newStep->index1=indexVar1;
+	newStep->index2=indexVar2;
+	if(temp != g_logicStack ){
+		while(temp != g_logicStack && !concluded){
+		
+		}
+	}
+	else{
+		newStep->next=newStep;
+		
+	}
+	
+
+}
+
+void solveStack(){
 
 }
 
@@ -147,6 +172,11 @@ int main(void){
 	for(int i=0;i<52;i++){
 		g_logicVars[i]=false;	
 	}
+	*g_logicStack=(stack*)malloc(sizeof(stack));
+	g_logicStack->next=g_logicStack;
+	g_logicStack->index1=-1;/* Setting to initialization value to -1 to provide awareness of newly created stack*/
+	g_logicStack->index2=-1;
+	g_logicStack->ope=-1;
 	return yyparse();
 
 }
